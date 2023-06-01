@@ -15,7 +15,6 @@ public class distribuirTarefas implements Runnable{
 
 	@Override
 	public void run() {
-
 		
 		try {
 			System.out.println("Distribuindo as tarefas para o cliente " + socket);
