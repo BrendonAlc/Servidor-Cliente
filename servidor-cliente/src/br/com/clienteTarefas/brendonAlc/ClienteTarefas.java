@@ -35,7 +35,6 @@ public class ClienteTarefas {
 					}
 					saida.close();
 					teclado.close();
-					socket.close();
 				
 				}catch (IOException e) {
 					throw new RuntimeException(e);
@@ -49,11 +48,34 @@ public class ClienteTarefas {
 			public void run() {
 				
 				try {
+					System.out.println("Recebendo dados do servidor");
+					Scanner respostaServidor = new Scanner(socket.getInputStream());
+					
+					while (respostaServidor.hasNextLine()) {
+						String linha = respostaServidor.nextLine();
+						System.out.println(linha);
+						
+					}
+					
+					respostaServidor.close();
 					
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
 				
 			}
-		})
+		});
+		
+		threadRecebeResposta.start();
+		threadEnviaComando.start();
+		
+		threadEnviaComando.join();
+		
+		System.out.println("Fechando o socket do cliente");
+				
+		socket.close();
 	}
+}
+	
+	
+	
