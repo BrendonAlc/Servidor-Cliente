@@ -69,6 +69,7 @@ public class ClienteTarefas {
 		threadRecebeResposta.start();
 		threadEnviaComando.start();
 		
+		//Juntando a thread MAIN a threadEnviaComando
 		threadEnviaComando.join();
 		
 		System.out.println("Fechando o socket do cliente");
