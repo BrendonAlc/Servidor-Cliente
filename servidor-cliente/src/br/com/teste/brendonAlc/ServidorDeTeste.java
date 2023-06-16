@@ -18,9 +18,36 @@ public class ServidorDeTeste {
 	
 	
 	private void rodar() {
-		Thread thread = new Thread(new TarefaPararServidor(this));
-		thread.start();
+//		Thread thread = new Thread(new TarefaPararServidor(this));
 		
+		Thread thread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				System.out.println("Servidor começando, estaRodando = " + estaRodando);
+
+				while (!estaRodando) {
+
+				}
+
+				if (estaRodando) {
+					throw new RuntimeException("Deu erro na thread...");
+				}
+
+				System.out.println("Servidor rodando, estaRodando = " + estaRodando);
+
+				while (estaRodando) {
+
+				}
+				System.out.println("Servidor terminando, estaRodando = " + estaRodando);
+			}
+		});
+		
+		//passando objeto com a responsabilidade de tratamento de erro
+		thread.setUncaughtExceptionHandler(new TratadorDeExcecao());
+
+		thread.start();
 	}
 
 	/*

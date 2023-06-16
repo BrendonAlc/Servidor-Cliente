@@ -6,20 +6,23 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import br.com.servidor.brendonAlc.distribuirTarefas;
 
-public class ServidorTarefas {
+public class ServidorTarefas extends Comandos {
 	
 	private ServerSocket servidor;
-	private ExecutorService threadPoll;
+	private ExecutorService threadPool;
 	private AtomicBoolean estaRodando;
 
 	public ServidorTarefas() throws IOException {
 		System.out.println("Iniciando Servidor!");
 		this.servidor = new ServerSocket(12345);
-		this.threadPoll =  Executors.newFixedThreadPool(2);
+		
+		ThreadFactory defaultFactory = Executors.defaultThreadFactory();
+		this.threadPool =  Executors.newFixedThreadPool(5, new FabricaDeThreads(defaultFactory));
 		this.estaRodando = new AtomicBoolean(true);
 	}
 
@@ -34,8 +37,9 @@ public class ServidorTarefas {
 				Socket socket = servidor.accept();
 				System.out.println("Aceitando novo cliente na porta " + socket.getPort());
 				
-				distribuirTarefas distribuirTarefas = new distribuirTarefas(socket, this);
-				this.threadPoll.execute(distribuirTarefas); //ThreadDePoll executando a tarefa
+				//adicionar threadPool no contrutor para executar os comandos
+				distribuirTarefas distribuirTarefas = new distribuirTarefas(threadPool, socket, this);
+				this.threadPool.execute(distribuirTarefas); //ThreadDePoll executando a tarefa
 			
 			} catch (SocketException e) {
 				System.out.println("SocketException, está rodando?" + this.estaRodando);
@@ -51,7 +55,7 @@ public class ServidorTarefas {
 	public void parar() throws IOException {
 		System.out.println("Parando servidor");
 		this.estaRodando.set(false);;
-		this.threadPoll.shutdown();
+		this.threadPool.shutdown();
 		this.servidor.close();
 	}
 	
