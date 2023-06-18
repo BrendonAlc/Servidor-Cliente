@@ -1,9 +1,11 @@
 package br.com.servidorTarefas.brendonAlc;
 
 import java.io.PrintStream;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class Comandos {
-
+	
 	public class ComandoA1 implements Runnable {
 
 		private PrintStream saida;
@@ -23,7 +25,7 @@ public class Comandos {
 			}
 			
 			//mensagem enviada para o cliente
-			saida.println("Comando a1 executado com sucesso!");
+			this.saida.println("Comando a1 executado com sucesso!");
 		}
 	}
 	
@@ -46,10 +48,9 @@ public class Comandos {
 			}
 			
 			//mensagem enviada para o cliente
-			saida.println("Comando a2 executado com sucesso!");
+			this.saida.println("Comando a2 executado com sucesso!");
 		}
 		
 	}
-	
 	
 }

@@ -1,9 +1,5 @@
 package br.com.teste.brendonAlc;
 
-import br.com.teste.brendonAlc.experimento;
-import br.com.teste.brendonAlc.ServidorDeTeste;
-
-
 public class TarefaPararServidor implements Runnable {
 
 	private ServidorDeTeste servidor;

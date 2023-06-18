@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-class experimento {
+public class experimento {
 
 	private volatile boolean estaRodando = false;
 

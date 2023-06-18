@@ -3,6 +3,8 @@ package br.com.servidor.brendonAlc;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -17,19 +19,20 @@ import br.com.servidorTarefas.brendonAlc.ServidorTarefas;
 public class distribuirTarefas extends Comandos implements Runnable{
 
 	private Socket socket;
-	private char[] comando;
 	private ServidorTarefas servidor;
 	private ExecutorService threadPool;
+	private BlockingQueue<String> filaComandos;
 	
-	public distribuirTarefas(ExecutorService threadPool, Socket socket, ServidorTarefas servidor) {
+	public distribuirTarefas(ExecutorService threadPool, BlockingQueue<String> filaComandos, Socket socket, ServidorTarefas servidor) {
+		this.threadPool = threadPool;
+		this.filaComandos = filaComandos;
 		this.socket = socket;
 		this.servidor = servidor;
-		this.threadPool = threadPool;
 		
 	}
 
 	@Override
-	public void run(Runnable c2WS) {
+	public void run() {
 		
 		try {
 			System.out.println("Distribuindo as tarefas para o cliente " + socket);
@@ -50,15 +53,26 @@ public class distribuirTarefas extends Comandos implements Runnable{
 					}
 				case "a2": {
 					saidaCliente.println("Confirmação do comando a2");
+					
+					//criando os dois comandos
 					ComandoA2ChamaWS a2WS = new ComandoA2ChamaWS(saidaCliente);
 					ComandoA2AcessandoBanco c2Banco = new ComandoA2AcessandoBanco(saidaCliente);
-					Future<?> FutureWS = this.threadPool.submit(c2WS);
-					Future<?> Futurebanco = this.threadPool.submit(c2Banco);
 					
-					this.threadPool.submit(new JuntaResultadoFuture);
+					//passando os comando para o pool, resultado é um Future
+					Future<String> futureWS = this.threadPool.submit(a2WS);
+					Future<String> futureBanco = this.threadPool.submit(c2Banco);
+					
+					Callable<Void> juntaResultados = new JuntaResultadoFutureWSFutureBanco(futureWS, futureBanco, saidaCliente);
+					this.threadPool.submit(juntaResultados);
 					
 					break;
 					}
+				case "a3": {
+					this.filaComandos.put(comando);//Bloqueia
+					saidaCliente.println("Comando a3 adicionado na fila");
+					
+					break;
+				}
 				case "fim": {
 					saidaCliente.println("Desligando servidor");
 					servidor.parar();
@@ -70,14 +84,11 @@ public class distribuirTarefas extends Comandos implements Runnable{
 				}
 			}
 			
-			System.out.println(comando);
-			
 			saidaCliente.close();
 			entradaCliente.close();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		
-	}	
-
+	}
 }

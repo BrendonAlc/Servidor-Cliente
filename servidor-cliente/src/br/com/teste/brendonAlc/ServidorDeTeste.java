@@ -1,5 +1,7 @@
 package br.com.teste.brendonAlc;
 
+import br.com.servidorTarefas.brendonAlc.TratadorDeExcecao;
+
 /**
  * 
  * @author balcantara
